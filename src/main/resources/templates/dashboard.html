@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commune - User Dashboard</title>
+  <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $(".menu-toggle").click(function() {
+        $(".sidebar").toggleClass("open");
+        $(".menu-toggle").toggle();
+      });
+      $(".close-btn").click(function() {
+        $(".sidebar").removeClass("open");
+        $(".menu-toggle").show();
+      });
+    });
+  </script>
+</head>
+
+<body>
+<header>
+  <h1><a th:href="@{/}">Commune</a></h1>
+</header>
+
+<div class="dashboard">
+  <button class="menu-toggle">&#9776; Channels</button>
+  <div class="sidebar">
+    <button class="close-btn">&times;</button>
+    <ul class="menu">
+      <li th:if="${user.role == 'Admin'}"><a th:href="@{/admin/add}">Add Admin</a></li>
+      <li th:if="${user.role == 'Admin'}"><a th:href="@{/admin/deleteUsers}">Remove Users</a></li>
+      <li><a th:href="@{/lostandfound}">Lost and Found</a></li>
+      <li><a th:href="@{/alerts}">Neighborhood Watch</a></li>
+      <li><a th:href="@{/marketplace}">Marketplace</a></li>
+      <li><a th:href="@{/babysitting}">Babysitting</a></li>
+      <li><a th:href="@{/resourcesharing}">Resource Sharing</a></li>
+      <li><a th:href="@{/carpool}">Carpools</a></li>
+      <li><a th:href="@{/events}">Community Events</a></li>
+      <li><a th:href="@{/polls}">Polls And Surveys</a></li>
+      <li><a th:href="@{/messages}">Contact People</a></li>
+    </ul>
+  </div>
+  <main class="content">
+    <h2>Welcome to Your Dashboard</h2>
+    <div class="user-profile" style="display: flex; align-items: center; justify-content: space-between;">
+      <div class="user-details">
+        <p><strong>Name:</strong> <span th:text="${user.firstName} + ' ' + ${user.lastName}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+        <p><strong>Username:</strong> <span th:text="${user.email}"></span></p>
+        <p><strong>Postal Code:</strong> <span th:text="${user.postalCode}"></span></p>
+      </div>
+      <img src="profile-picture.jpg" alt="User Profile Picture" class="profile-picture" style="max-width: 150px; border-radius: 10px;">
+    </div>
+  </main>
+</div>
+
+<footer>
+  <p>&copy; 2024 Commune. All rights reserved. Commune</p>
+</footer>
+</body>
+
+</html>

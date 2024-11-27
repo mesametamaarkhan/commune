@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commune - Connect with Your Neighborhood</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+
+<body>
+<header>
+    <nav>
+        <div class="logo">
+            <h1>Commune</h1>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/about}">About</a>
+        </div>
+    </nav>
+</header>
+
+<section class="hero">
+    <div class="hero-content">
+        <h2 th:text="'Discover your neighborhood'">Discover your neighborhood</h2>
+        <div class="login-options">
+            <form th:action="@{/login}" method="post">
+                <input type="email" placeholder="Email address" name="email" required>
+                <input type="password" placeholder="Enter password" name="password" required>
+                <button type="submit" class="btn btn-continue">Continue</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="about">
+    <h2 th:text="'Get the most out of your neighborhood with Commune'">Get the most out of your neighborhood with Commune</h2>
+    <p th:text="'Commune is where communities come together...'">Commune is where communities come together...</p>
+    <div class="features">
+        <div class="feature">
+            <h3 th:text="'Essential'">Essential</h3>
+            <p th:text="'Relevant news and information from neighbors...'">Relevant news and information from neighbors...</p>
+        </div>
+        <div class="feature">
+            <h3 th:text="'Local'">Local</h3>
+            <p th:text="'The only way to instantly connect...'">The only way to instantly connect...</p>
+        </div>
+        <div class="feature">
+            <h3 th:text="'Trusted'">Trusted</h3>
+            <p th:text="'A secure environment where all neighbors...'">A secure environment where all neighbors...</p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p th:text="'Instantly connect with your neighborhood'">Instantly connect with your neighborhood</p>
+    <button class="btn btn-signup" th:onclick="|window.location='@{/signup}'|">Sign Up</button>
+</footer>
+
+</body>
+
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commune - Marketplace</title>
+    <link rel="stylesheet" th:href="@{/css/marketplace.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".menu-toggle").click(function() {
+                $(".sidebar").toggleClass("open");
+                $(".menu-toggle").toggle();
+            });
+            $(".close-btn").click(function() {
+                $(".sidebar").removeClass("open");
+                $(".menu-toggle").show();
+            });
+
+            $(".create-post-btn").click(function() {
+                $(".create-post-card").show();
+            });
+
+            $(".close-post-btn").click(function() {
+                $(".create-post-card").hide();
+            });
+
+            $("#post-submit").click(function() {
+                const productName = $("#product-name").val();
+                const productPrice = $("#product-price").val();
+                const productDescription = $("#product-description").val();
+                const senderName = "John Doe";
+                const currentTime = new Date().toLocaleString();
+
+                if (productName && productPrice && productDescription) {
+                    const postHtml = `
+                        <div class="post-card">
+                            <h4>MARKETPLACE LISTING</h4>
+                            <p><strong>Product:</strong> ${productName}</p>
+                            <p><strong>Price:</strong> ${productPrice}</p>
+                            <p>${productDescription}</p>
+                            <p class="post-info"><strong>Posted by:</strong> ${senderName} at ${currentTime}</p>
+                            <button class="contact-seller-btn">Contact Seller</button>
+                        </div>
+                    `;
+                    $(".chat-display").append(postHtml);
+                    $(".create-post-card").hide();
+                    $("#product-name").val("");
+                    $("#product-price").val("");
+                    $("#product-description").val("");
+                }
+            });
+
+            $(document).on("click", ".contact-seller-btn", function() {
+                const sellerId = $(this).data("seller-id"); // Get the babysitter's ID from the button
+                console.log(sellerId);
+
+                fetch(`/marketplace/contact?id=${sellerId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Failed to fetch contact information.");
+                        }
+                        return response.json(); // Parse the JSON response
+                    })
+                    .then(data => {
+                        const contactHtml = `
+                            <div class="contact-seller-card">
+                                <div class="contact-card-content">
+                                    <button class="close-contact-btn">&times;</button>
+                                    <h3>Contact Seller</h3>
+                                    <p><strong>Email:</strong> ${data.email}</p>
+                                    <p><strong>Phone:</strong> ${data.phoneNumber}</p>
+                                </div>
+                            </div>
+                        `;
+                        $("body").append(contactHtml); // Append the modal to the body
+                    })
+                    .catch(error => {
+                        console.error(error); // Log the error to the console
+                        alert("Failed to fetch contact information. Please try again.");
+                    });
+            });
+
+            $(document).on("click", ".close-contact-btn", function() {
+                $(".contact-seller-card").remove();
+            });
+        });
+    </script>
+</head>
+<body>
+<header>
+    <h1><a th:href="@{/}">Commune</a></h1>
+</header>
+
+<div class="dashboard">
+    <button class="menu-toggle">&#9776; Channels</button>
+    <div class="sidebar">
+        <button class="close-btn">&times;</button>
+        <ul class="menu">
+            <li th:if="${role == 'Admin'}"><a th:href="@{/admin/add}">Add Admin</a></li>
+            <li th:if="${role == 'Admin'}"><a th:href="@{/admin/deleteUsers}">Remove Users</a></li>
+            <li><a th:href="@{/lostandfound}">Lost and Found</a></li>
+            <li><a th:href="@{/alerts}">Neighborhood Watch</a></li>
+            <li><a th:href="@{/marketplace}">Marketplace</a></li>
+            <li><a th:href="@{/babysitting}">Babysitting</a></li>
+            <li><a th:href="@{/resourcesharing}">Resource Sharing</a></li>
+            <li><a th:href="@{/carpool}">Carpools</a></li>
+            <li><a th:href="@{/events}">Community Events</a></li>
+            <li><a th:href="@{/polls}">Polls And Surveys</a></li>
+            <li><a th:href="@{/messages}">Contact People</a></li>
+        </ul>
+    </div>
+    <main class="content">
+        <h2>Marketplace Channel</h2>
+        <div class="chat-display">
+            <div th:each="item : ${items}" class="post-card">
+                <h4>MARKETPLACE LISTING</h4>
+                <p><strong>Product:</strong> <span th:text="${item.itemName}"></span></p>
+                <p><strong>Price:</strong> <span th:text="${item.price}"></span></p>
+                <p><span th:text="${item.description}"></span></p>
+                <p class="post-info">
+                    <strong>Posted by:</strong> <span th:text="${item.sellerName}"></span>
+                    at <span th:text="${#dates.format(item.postedDate, 'dd-MM-yyyy HH:mm')}"></span>
+                </p>
+                <button class="contact-seller-btn" th:data-seller-id="${item.sellerId}">Contact Seller</button>
+            </div>
+        </div>
+        <button class="create-post-btn">Create New Post</button>
+
+        <div class="create-post-card" style="display: none;">
+            <div class="post-card-content">
+                <button class="close-post-btn">&times;</button>
+                <h3>Create a Post</h3>
+                <form action="/marketplace" method="POST">
+                    <input type="text" id="itemName" name="itemName" placeholder="Enter product name" required>
+                    <br>
+                    <input type="text" id="price" name="price" placeholder="Enter product price" required>
+                    <br>
+                    <textarea id="description" name="description" placeholder="Enter product description" required></textarea>
+                    <br>
+                    <button type="submit" id="post-submit">Post</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+
+
+</html>

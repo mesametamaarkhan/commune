@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Commune Messaging</title>
+  <script>
+    let currentUserId;
+    let selectedUserItem = null;
+    let chattingWithId = 0;
+
+    function initializeCurrentUserId() {
+      const chatPanel = document.querySelector('.chat-panel');
+      if (chatPanel) {
+        currentUserId = chatPanel.getAttribute("data-current-user-id");
+        console.log("Initialized Current User ID:", currentUserId);
+      }
+      else {
+        console.error("Chat panel not found. Unable to initialize currentUserId.");
+      }
+    }
+
+    async function fetchConversation(receiverId) {
+      highlightUser(receiverId);
+      chattingWithId = receiverId;
+      try {
+        const response = await fetch(`/messages/conversation?userId1=${currentUserId}&userId2=${receiverId}`);
+        if (response.ok) {
+          const messages = await response.json();
+          const chatContainer = document.getElementById("chat-container");
+          chatContainer.innerHTML = "";
+          messages.forEach(message => {
+            addMessageToUI(message);
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching conversation:", error);
+      }
+    }
+
+    function highlightUser(receiverId) {
+      if (selectedUserItem) {
+        selectedUserItem.classList.remove("selected");
+      }
+      selectedUserItem = document.querySelector(`.user-item[data-user-id="${receiverId}"]`);
+      if (selectedUserItem) {
+        selectedUserItem.classList.add("selected");
+      }
+    }
+
+    async function sendMessage() {
+      const contentInput = document.getElementById("message-input");
+      const content = contentInput.value;
+      if (!content.trim() || !chattingWithId) {
+        alert("Message cannot be empty or no user selected!");
+        return;
+      }
+      try {
+        const response = await fetch('/messages/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ senderId: currentUserId, receiverId: chattingWithId, content })
+        });
+        if (response.ok) {
+          contentInput.value = ""; // Clear the input field
+          fetchConversation(chattingWithId); // Refresh conversation
+        }
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
+    }
+
+    function addMessageToUI(message) {
+      const chatContainer = document.getElementById("chat-container");
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("message", message.senderId === currentUserId ? "sent" : "received");
+      messageDiv.innerHTML = `<strong>${message.senderId === currentUserId ? "You" : "User " + message.senderId}:</strong> ${message.content}`;
+      chatContainer.appendChild(messageDiv);
+    }
+
+    async function pollUnreadMessages() {
+      try {
+        const response = await fetch(`/messages/unread?receiverId=${currentUserId}`);
+        if (response.ok) {
+          const messages = await response.json();
+          if (messages.length > 0 && chattingWithId) {
+            await fetchConversation(chattingWithId);
+          }
+        }
+      }
+      catch (error) {
+        console.error("Error polling messages:", error);
+      }
+      setTimeout(pollUnreadMessages, 2500);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initializeCurrentUserId();
+      pollUnreadMessages();
+    });
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      margin: 0;
+    }
+    .user-list {
+      width: 25%;
+      border-right: 1px solid #ccc;
+      overflow-y: auto;
+      background: #f8f8f8;
+    }
+    .user-list h3 {
+      margin: 0;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      text-align: center;
+    }
+    .user-item {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .user-item:hover {
+      background: #efefef;
+    }
+    .chat-panel {
+      width: 75%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .chat-header {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      background: #007bff;
+      color: white;
+      text-align: center;
+    }
+    .chat-container {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background: #f4f4f4;
+    }
+    .chat-container .message {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 70%;
+    }
+    .chat-container .message.sent {
+      background: #d1f7c4;
+      align-self: flex-end;
+    }
+    .chat-container .message.received {
+      background: #fff;
+      align-self: flex-start;
+    }
+    .chat-footer {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+      background: #fff;
+    }
+    .chat-footer input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .user-item.selected {
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+    }
+    .chat-footer button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="user-list">
+  <h3>Users</h3>
+  <ul>
+    <li class="user-item" th:each="user : ${users}" th:data-user-id="${user.getUserID()}" th:data-user-fname="${user.getFirstName()}" th:onclick="|fetchConversation(${user.getUserID()})|">
+      <span th:text="${user.firstName}">User</span>
+    </li>
+  </ul>
+</div>
+
+<div class="chat-panel" th:data-current-user-id="${currentUserId}">
+  <div class="chat-header">
+    <span th:text="'Chat with '">Chat with User</span>
+  </div>
+  <div id="chat-container" class="chat-container">
+  </div>
+  <div class="chat-footer">
+    <input id="message-input" type="text" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+</body>
+</html>

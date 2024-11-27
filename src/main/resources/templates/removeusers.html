@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commune - Users List</title>
+    <link rel="stylesheet" th:href="@{/css/newsalert.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".menu-toggle").click(function() {
+                $(".sidebar").toggleClass("open");
+                $(".menu-toggle").toggle();
+            });
+            $(".close-btn").click(function() {
+                $(".sidebar").removeClass("open");
+                $(".menu-toggle").show();
+            });
+        });
+        $(".delete-post-btn").click(function () {
+            const userId = $(this).attr("th:data-alert-id");
+
+            if (confirm("Are you sure you want to delete this user?")) {
+                $.ajax({
+                    url: '/admin/deleteUser',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ userID: userId }),
+                    success: function (response) {
+                        alert("User deleted successfully!");
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        alert("An error occurred: " + xhr.responseText);
+                    }
+                });
+            }
+        });
+    </script>
+</head>
+
+<body>
+<header>
+    <h1><a th:href="@{/}">Commune</a></h1>
+</header>
+
+<div class="dashboard">
+    <button class="menu-toggle">&#9776; Channels</button>
+    <div class="sidebar">
+        <button class="close-btn">&times;</button>
+        <ul class="menu">
+            <li th:if="${role == 'Admin'}"><a th:href="@{/admin/add}">Add Admin</a></li>
+            <li th:if="${role == 'Admin'}"><a th:href="@{/admin/deleteUsers}">Remove Users</a></li>
+            <li><a th:href="@{/lostandfound}">Lost and Found</a></li>
+            <li><a th:href="@{/alerts}">Neighborhood Watch</a></li>
+            <li><a th:href="@{/marketplace}">Marketplace</a></li>
+            <li><a th:href="@{/babysitting}">Babysitting</a></li>
+            <li><a th:href="@{/resourcesharing}">Resource Sharing</a></li>
+            <li><a th:href="@{/carpool}">Carpools</a></li>
+            <li><a th:href="@{/events}">Community Events</a></li>
+            <li><a th:href="@{/polls}">Polls And Surveys</a></li>
+            <li><a th:href="@{/messages}">Contact People</a></li>
+        </ul>
+    </div>
+    <main class="content">
+        <h2>Users List</h2>
+        <div class="chat-display">
+            <h4>Users</h4>
+            <div th:each="user : ${users}" class="post-card">
+                <h5>User Details</h5>
+                <p><strong>Name:</strong> <span th:text="${user.firstName} + ' ' + ${user.lastName}"></span></p>
+                <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                <p><strong>Phone Number:</strong> <span th:text="${user.phoneNumber}"></span></p>
+                <p><strong>Role:</strong> <span th:text="${user.role}"></span></p>
+                <p><strong>Postal Code:</strong> <span th:text="${user.postalCode}"></span></p>
+                <button class="delete-post-btn" th:data-alert-id="${user.userID}">Delete</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+
+</html>

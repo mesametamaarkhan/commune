@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babysitting Channel</title>
+    <link rel="stylesheet" th:href="@{/css/babysitting.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".menu-toggle").click(function() {
+                $(".sidebar").toggleClass("open");
+                $(".menu-toggle").toggle();
+            });
+            $(".close-btn").click(function() {
+                $(".sidebar").removeClass("open");
+                $(".menu-toggle").show();
+            });
+
+            $(".create-post-btn").click(function() {
+                $(".create-post-card").show();
+            });
+
+            $(".close-post-btn").click(function() {
+                $(".create-post-card").hide();
+            });
+
+            $("#post-submit").click(function() {
+                const babysitterName = $("#babysitter-name").val();
+                const babysitterLocation = $("#babysitter-location").val();
+                const babysitterRate = $("#babysitter-rate").val();
+                const babysitterHours = $("#babysitter-hours").val();
+                const senderName = "John Doe";
+                const currentTime = new Date().toLocaleString();
+
+                if (babysitterName && babysitterLocation && babysitterRate && babysitterHours) {
+                    const postHtml = `
+                        <div class="post-card">
+                            <h4>BABYSITTING OFFER</h4>
+                            <p><strong>Name:</strong> ${babysitterName}</p>
+                            <p><strong>Location:</strong> ${babysitterLocation}</p>
+                            <p><strong>Rate:</strong> ${babysitterRate}</p>
+                            <p><strong>Hours Available:</strong> ${babysitterHours}</p>
+                            <p class="post-info"><strong>Posted by:</strong> ${senderName} at ${currentTime}</p>
+                            <button class="contact-seller-btn">Contact Babysitter</button>
+                        </div>
+                    `;
+                    $(".chat-display").append(postHtml);
+                    $(".create-post-card").hide();
+                    $("#babysitter-name").val("");
+                    $("#babysitter-location").val("");
+                    $("#babysitter-rate").val("");
+                    $("#babysitter-hours").val("");
+                }
+            });
+
+            $(document).on("click", ".contact-seller-btn", function() {
+                const babysitterId = $(this).data("babysitter-id"); // Get the babysitter's ID from the button
+                console.log(babysitterId);
+                // Use fetch API to send a GET request
+                fetch(`/babysitting/contact?id=${babysitterId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Failed to fetch contact information.");
+                        }
+                        return response.json(); // Parse the JSON response
+                    })
+                    .then(data => {
+                        const contactHtml = `
+                            <div class="contact-seller-card">
+                                <div class="contact-card-content">
+                                    <button class="close-contact-btn">&times;</button>
+                                    <h3>Contact Babysitter</h3>
+                                    <p><strong>Email:</strong> ${data.email}</p>
+                                    <p><strong>Phone:</strong> ${data.phoneNumber}</p>
+                                </div>
+                            </div>
+                        `;
+                        $("body").append(contactHtml); // Append the modal to the body
+                    })
+                    .catch(error => {
+                        console.error(error); // Log the error to the console
+                        alert("Failed to fetch contact information. Please try again.");
+                    });
+            });
+
+
+
+            $(document).on("click", ".close-contact-btn", function() {
+                $(".contact-seller-card").remove();
+            });
+        });
+    </script>
+</head>
+
+<body>
+<header>
+    <h1><a th:href="@{/}">Commune</a></h1>
+</header>
+
+<div class="dashboard">
+    <button class="menu-toggle">&#9776; Channels</button>
+    <div class="sidebar">
+        <button class="close-btn">&times;</button>
+        <ul class="menu">
+            <li th:if="${role == 'Admin'}"><a th:href="@{/admin/add}">Add Admin</a></li>
+            <li th:if="${role == 'Admin'}"><a th:href="@{/admin/deleteUsers}">Remove Users</a></li>
+            <li><a th:href="@{/lostandfound}">Lost and Found</a></li>
+            <li><a th:href="@{/alerts}">Neighborhood Watch</a></li>
+            <li><a th:href="@{/marketplace}">Marketplace</a></li>
+            <li><a th:href="@{/babysitting}">Babysitting</a></li>
+            <li><a th:href="@{/resourcesharing}">Resource Sharing</a></li>
+            <li><a th:href="@{/carpool}">Carpools</a></li>
+            <li><a th:href="@{/events}">Community Events</a></li>
+            <li><a th:href="@{/polls}">Polls And Surveys</a></li>
+            <li><a th:href="@{/messages}">Contact People</a></li>
+        </ul>
+    </div>
+    <main class="content">
+        <h2>Babysitting Channel</h2>
+        <div class="chat-display">
+            <div class="post-card" th:each="babysit : ${babysitting}">
+                <h4>BABYSITTING OFFER</h4>
+                <p><strong>Name:</strong><span th:text="${babysit.name}">Name</span></p>
+                <p><strong>Location:</strong><span th:text="${babysit.location}">Location</span></p>
+                <p><strong>Rate:</strong><span th:text="${babysit.ratePerHour}">Rate Per Hour</span></p>
+                <p><strong>Hours Available:</strong><span th:text="${babysit.hoursAvailable}">Hours Available</span></p>
+                <p class="post-info">
+                    <strong>Posted by:</strong> <span th:text="${babysit.name}"></span>
+                    <span th:text="${#dates.format(babysit.postDate, 'yyyy-MM-dd HH:mm')}">Date</span>
+                </p>
+                <button class="contact-seller-btn" th:data-babysitter-id="${babysit.userID}">Contact Babysitter</button>
+            </div>
+        </div>
+        <button class="create-post-btn">Create New Post</button>
+        <div class="create-post-card" style="display: none;">
+            <div class="post-card-content">
+                <button class="close-post-btn">&times;</button>
+                <h3>Create a Post</h3>
+                <form th:action="@{/babysitting}" method="post">
+                    <label for="name">Enter Your Name:</label>
+                    <input type="text" id="name" name="name" required>
+                    <br>
+                    <label for="location">Enter Location:</label>
+                    <input type="text" id="location" name="location" required>
+                    <br>
+                    <label for="ratePerHour">Enter Rate Per Hour:</label>
+                    <input type="text" id="ratePerHour" name="ratePerHour" required>
+                    <br>
+                    <label for="hoursAvailable">Enter Hours Available:</label>
+                    <input type="text" id="hoursAvailable" name="hoursAvailable" required>
+                    <br>
+                    <button type="submit">Post</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Sharing Channel</title>
+    <link rel="stylesheet" th:href="@{/css/resourcesharing.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".menu-toggle").click(function() {
+                $(".sidebar").toggleClass("open");
+                $(".menu-toggle").toggle();
+            });
+            $(".close-btn").click(function() {
+                $(".sidebar").removeClass("open");
+                $(".menu-toggle").show();
+            });
+
+            $(".create-post-btn").click(function() {
+                $(".create-post-card").show();
+            });
+
+            $(".close-post-btn").click(function() {
+                $(".create-post-card").hide();
+            });
+
+            $("#post-submit").click(function() {
+                const resourceName = $("#resource-name").val();
+                const resourceLocation = $("#resource-location").val();
+                const senderName = "John Doe";
+                const currentTime = new Date().toLocaleString();
+
+                if (resourceName && resourceLocation) {
+                    const postHtml = `
+                        <div class="post-card">
+                            <h4>RESOURCE SHARING</h4>
+                            <p><strong>Resource:</strong> ${resourceName}</p>
+                            <p><strong>Location:</strong> ${resourceLocation}</p>
+                            <p class="post-info"><strong>Posted by:</strong> ${senderName} at ${currentTime}</p>
+                            <button class="contact-seller-btn">Contact Sharer</button>
+                        </div>
+                    `;
+                    $(".chat-display").append(postHtml);
+                    $(".create-post-card").hide();
+                    $("#resource-name").val("");
+                    $("#resource-location").val("");
+                }
+            });
+
+            $(document).on("click", ".contact-seller-btn", function() {
+                const sharerId = $(this).data("sharer-id");
+
+                fetch(`/resourcesharing/contact?id=${sharerId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Failed to fetch contact information.");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const contactHtml = `
+                            <div class="contact-seller-card">
+                                <div class="contact-card-content">
+                                    <button class="close-contact-btn">&times;</button>
+                                    <h3>Contact Sharer</h3>
+                                    <p><strong>Email:</strong> ${data.email}</p>
+                                    <p><strong>Phone:</strong> ${data.phoneNumber}</p>
+                                </div>
+                            </div>
+                        `;
+                        $("body").append(contactHtml);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert("Failed to fetch contact information. Please try again.");
+                    });
+            });
+
+            $(document).on("click", ".close-contact-btn", function() {
+                $(".contact-seller-card").remove();
+            });
+        });
+    </script>
+</head>
+
+<body>
+<header>
+    <h1><a th:href="@{/}">Commune</a></h1>
+</header>
+
+<div class="dashboard">
+    <button class="menu-toggle">☰ Channels</button>
+    <div class="sidebar">
+        <button class="close-btn">&times;</button>
+        <ul class="menu">
+            <li th:if="${role == 'Admin'}"><a th:href="@{/admin/add}">Add Admin</a></li>
+            <li th:if="${role == 'Admin'}"><a th:href="@{/admin/deleteUsers}">Remove Users</a></li>
+            <li><a th:href="@{/lostandfound}">Lost and Found</a></li>
+            <li><a th:href="@{/alerts}">Neighborhood Watch</a></li>
+            <li><a th:href="@{/marketplace}">Marketplace</a></li>
+            <li><a th:href="@{/babysitting}">Babysitting</a></li>
+            <li><a th:href="@{/resourcesharing}">Resource Sharing</a></li>
+            <li><a th:href="@{/carpool}">Carpools</a></li>
+            <li><a th:href="@{/events}">Community Events</a></li>
+            <li><a th:href="@{/polls}">Polls And Surveys</a></li>
+            <li><a th:href="@{/messages}">Contact People</a></li>
+        </ul>
+    </div>
+    <main class="content">
+        <h2>Resource Sharing Channel</h2>
+        <div class="chat-display">
+            <div class="post-card" th:each="resource : ${sharedResources}">
+                <h4>RESOURCE SHARING</h4>
+                <p><strong>Resource:</strong><span th:text="${resource.resourceName}">Resource</span></p>
+                <p><strong>Status:</strong><span th:text="${resource.status}">Status</span></p>
+                <p class="post-info">
+                    <strong>Posted by:</strong><span th:text="${resource.sharerName}"></span>
+                    <span th:text="${#dates.format(resource.sharedDate, 'yyyy-MM-dd HH:mm')}">Date</span>
+                </p>
+                <button class="contact-seller-btn" th:data-sharer-id="${resource.sharerId}">Contact Sharer</button>
+            </div>
+        </div>
+        <button class="create-post-btn">Create New Post</button>
+
+        <div class="create-post-card" style="display: none;">
+            <div class="post-card-content">
+                <button class="close-post-btn">&times;</button>
+                <h3>Create a Post</h3>
+                <form th:action="@{/resourcesharing}" method="post">
+                    <label for="resourceName">Enter Resource Name:</label>
+                    <input type="text" id="resourceName" name="resourceName" placeholder="Enter the resource you are sharing" required>
+                    <br>
+                    <label for="status">Enter Status (Available/Borrowed):</label>
+                    <input type="text" id="status" name="status" placeholder="Enter Status" required>
+                    <br>
+                    <button id="post-submit" type="submit">Post</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+
+</html>

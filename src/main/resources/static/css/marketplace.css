@@ -1,0 +1,291 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #abe1fa;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+header {
+    background: #78ccf4;
+    padding: 20px;
+    color: #fff;
+    text-align: center;
+    border-radius: 20px;
+    margin: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+/* Dashboard Layout */
+.dashboard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 240px);
+}
+
+.menu-toggle {
+    background: #fff;
+    color: #000;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 20px;
+    position: fixed;
+    top: 25px;
+    left: 20px;
+    z-index: 1000;
+    text-align: center;
+}
+
+.sidebar {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 250px;
+    transition: transform 0.3s ease;
+    transform: translateX(-100%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar.open {
+    transform: translateX(0);
+}
+
+.sidebar.open + .menu-toggle {
+    display: none;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 1.5rem;
+    cursor: pointer;
+    align-self: flex-end;
+    margin-bottom: 10px;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    margin-top: 30px;
+}
+
+.menu li {
+    margin-bottom: 15px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    padding: 10px;
+    display: block;
+    text-align: left;
+    transition: color 0.3s ease;
+}
+
+.menu a:hover {
+    color: #78ccf4;
+}
+
+.content {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 60%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    top: 20px;
+    max-height: calc(100vh - 160px);
+    overflow: hidden;
+}
+
+.fixed-header {
+    position: sticky;
+    top: 20px;
+    background-color: #fff;
+    z-index: 10;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.chat-display {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex-grow: 1;
+    height: auto;
+    max-height: 300px;
+}
+
+.post-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-info {
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: 10px;
+}
+
+.create-post-btn {
+    background: #78ccf4;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    align-self: flex-end;
+    margin-top: 10px;
+    width: fit-content;
+}
+
+.create-post-btn:hover {
+    background: #45a049;
+}
+
+.create-post-card {
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-card-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 300px;
+    position: relative;
+}
+
+.close-post-btn {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#itemName,
+#price,
+#description {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#description {
+    height: 100px;
+}
+
+button[type="submit"] {
+    background: #78ccf4;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 15px;
+    width: 100%;
+}
+
+button[type="submit"]:hover {
+    background: #45a049;
+}
+
+
+.contact-seller-card {
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+}
+
+.contact-card-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 300px;
+    position: relative;
+}
+
+.close-contact-btn {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard {
+        flex-direction: column;
+    }
+
+    .content {
+        margin-top: 20px;
+        width: 90%;
+    }
+
+    .menu-toggle {
+        left: 10px;
+    }
+
+    .sidebar {
+        width: 200px;
+    }
+}
