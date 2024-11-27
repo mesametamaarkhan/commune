@@ -1,0 +1,123 @@
+use commune2;
+CREATE TABLE Users (
+    UserID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName NVARCHAR(256) NOT NULL,
+    LastName NVARCHAR(256) NOT NULL,
+    Email NVARCHAR(100) UNIQUE NOT NULL,
+    Role NVARCHAR(100) NOT NULL,
+    Password NVARCHAR(256) NOT NULL,
+    PhoneNumber NVARCHAR(11) NOT NULL,
+    PostalCode NVARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Item (
+    ItemID INT PRIMARY KEY AUTO_INCREMENT,
+    ItemName NVARCHAR(100) NOT NULL,
+    Description TEXT,
+    Price NVARCHAR(256) NOT NULL,
+    Status NVARCHAR(256) NOT NULL,
+    Seller_ID INT NOT NULL,
+    Buyer_ID INT,
+    DatePosted DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (Seller_ID) REFERENCES Users(UserID),
+    FOREIGN KEY (Buyer_ID) REFERENCES Users(UserID)
+);
+
+CREATE TABLE Event (
+    EventID INT PRIMARY KEY AUTO_INCREMENT,
+    EventTitle NVARCHAR(100) NOT NULL,
+    Description TEXT,
+    OrganizerID INT NOT NULL,
+    EventDate DATETIME NOT NULL,
+    Location NVARCHAR(255),
+    FOREIGN KEY (OrganizerID) REFERENCES Users(UserID)
+);
+
+CREATE TABLE LostAndFoundItem (
+    LostFoundID INT PRIMARY KEY AUTO_INCREMENT,
+    ItemName NVARCHAR(100) NOT NULL,
+    Description TEXT,
+    UserID INT NOT NULL,
+    ReportDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+CREATE TABLE PollAndSurvey (
+    PollID INT PRIMARY KEY AUTO_INCREMENT,
+    Title NVARCHAR(100) NOT NULL,
+    Description TEXT,
+    CreatedBy INT NOT NULL,
+    CreatedDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (CreatedBy) REFERENCES Users(UserID)
+);
+
+CREATE TABLE PollOptions (
+    OptionID INT NOT NULL AUTO_INCREMENT,
+    PollID INT NOT NULL,
+    OptionText NVARCHAR(100) NOT NULL,
+    OptionSelectCount INT DEFAULT 0,
+    PRIMARY KEY (OptionID, PollID),
+    FOREIGN KEY (PollID) REFERENCES PollAndSurvey(PollID)
+);
+
+CREATE TABLE PollVotes (
+    UserID INT NOT NULL,
+    PollID INT NOT NULL,
+    OptionID INT NOT NULL,
+    PRIMARY KEY (UserID, PollID),
+    FOREIGN KEY (PollID) REFERENCES PollAndSurvey(PollID),
+    FOREIGN KEY (OptionID, PollID) REFERENCES PollOptions(OptionID, PollID)
+);
+
+
+CREATE TABLE BabySitting (
+    BabySitterID INT PRIMARY KEY AUTO_INCREMENT,
+    Name NVARCHAR(256) NOT NULL,
+    UserID INT NOT NULL,
+    Location TEXT,
+    RatePerHour INT NOT NULL,
+    HoursAvailable TEXT,
+    PostDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+CREATE TABLE ResourceShare (
+    ShareID INT PRIMARY KEY AUTO_INCREMENT,
+    ResourceName NVARCHAR(100) NOT NULL,
+    SharedBy INT NOT NULL,
+    BorrowerID INT,
+    Status NVARCHAR(100) NOT NULL,
+    SharedDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (SharedBy) REFERENCES Users(UserID),
+    FOREIGN KEY (BorrowerID) REFERENCES Users(UserID)
+);
+
+CREATE TABLE Carpool (
+    CarpoolID INT PRIMARY KEY AUTO_INCREMENT,
+    DriverID INT NOT NULL,
+    AvailableSeats INT NOT NULL,
+    StartLocation NVARCHAR(255) NOT NULL,
+    Destination NVARCHAR(255) NOT NULL,
+    DepartureTime DATETIME,
+    FOREIGN KEY (DriverID) REFERENCES Users(UserID)
+);
+
+CREATE TABLE Alerts (
+    AlertID INT PRIMARY KEY AUTO_INCREMENT,
+    Description TEXT NOT NULL,
+    IssuedBy INT NOT NULL,
+    IssuedDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (IssuedBy) REFERENCES Users(UserID)
+);
+
+CREATE TABLE messages (
+    message_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    content TEXT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (sender_id) REFERENCES users(UserID),
+    FOREIGN KEY (receiver_id) REFERENCES users(UserID)
+);
+
