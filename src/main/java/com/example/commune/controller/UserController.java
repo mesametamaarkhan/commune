@@ -114,21 +114,4 @@ public class UserController {
             return "redirect:/dashboard";
         }
     }
-
-    @GetMapping("/admin/deleteUsers")
-    public String goToRemoveUser(Model model, HttpSession session) {
-        try {
-            if(session.getAttribute("role").toString().equalsIgnoreCase("Admin")) {
-                User currentUser = userService.getUserById((Integer) session.getAttribute("userId"));
-                Iterable<User> users = userService.getAllUsers(currentUser);
-                model.addAttribute("users", users);
-                model.addAttribute("role", "Admin");
-                return "removeusers";
-            }
-            return "redirect:/dashboard";
-        }
-        catch(Exception e) {
-            return "redirect:/dashboard";
-        }
-    }
 }

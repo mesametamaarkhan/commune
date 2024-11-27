@@ -31,4 +31,5 @@ public class AlertsRepository {
         String query = "SELECT a.AlertID, a.Description, CONCAT(u.FirstName, ' ', u.LastName) AS name, a.IssuedDate AS date FROM alerts a JOIN Users u ON a.IssuedBy = u.UserID WHERE u.PostalCode = (SELECT PostalCode FROM Users WHERE UserID = ?);\n";
         return jdbcTemplate.query(query, new BeanPropertyRowMapper<>(AlertDTO.class), userId);
     }
+
 }

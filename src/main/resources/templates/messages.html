@@ -138,6 +138,19 @@
       background: #007bff;
       color: white;
       text-align: center;
+      position: relative;
+    }
+    .chat-header .back-button {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #f8f8f8;
+      color: #007bff;
+      border: 1px solid #007bff;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
     }
     .chat-container {
       flex: 1;
@@ -200,7 +213,8 @@
 
 <div class="chat-panel" th:data-current-user-id="${currentUserId}">
   <div class="chat-header">
-    <span th:text="'Chat with '">Chat with User</span>
+    <a class="back-button" th:href="@{/dashboard}">Back to Dashboard</a>
+    <span th:text="'Chat'">Chat with User</span>
   </div>
   <div id="chat-container" class="chat-container">
   </div>

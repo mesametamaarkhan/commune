@@ -18,25 +18,6 @@
                 $(".menu-toggle").show();
             });
         });
-        $(".delete-post-btn").click(function () {
-            const userId = $(this).attr("th:data-alert-id");
-
-            if (confirm("Are you sure you want to delete this user?")) {
-                $.ajax({
-                    url: '/admin/deleteUser',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ userID: userId }),
-                    success: function (response) {
-                        alert("User deleted successfully!");
-                        location.reload();
-                    },
-                    error: function (xhr, status, error) {
-                        alert("An error occurred: " + xhr.responseText);
-                    }
-                });
-            }
-        });
     </script>
 </head>
 
@@ -61,6 +42,7 @@
             <li><a th:href="@{/events}">Community Events</a></li>
             <li><a th:href="@{/polls}">Polls And Surveys</a></li>
             <li><a th:href="@{/messages}">Contact People</a></li>
+            <li><a th:href="@{/}">Logout</a></li>
         </ul>
     </div>
     <main class="content">
